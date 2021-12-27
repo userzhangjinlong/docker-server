@@ -1,0 +1,97 @@
+version: '3.8'
+services:
+  php70:
+    build: ./php70
+    ports:
+      - "9004:9000"
+    volumes:
+      - ~/work:/www/project
+      - ./deps/supervisord.conf:/etc/supervisor/supervisord.conf:ro
+      - ./deps/supervisor.d:/etc/supervisor/supervisor.d:ro
+      - ./hosts:/www/hosts:ro
+      - ./logs/70:/usr/local/var/log
+      - ./logs/70:/data/log/service
+      - ./logs/70:/var/log/lazy
+      - ~/worklogs/log:/data/log
+      - ~/dockers-config/rainbow-niffler:/rainbow-niffler
+      - ~/dockers-config/niffler:/niffler
+      - ./conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    networks:
+      - wpt-network
+
+  php72:
+    build: ./php72
+    ports:
+      - "9006:9000"
+      - "9010:9009"
+    volumes:
+      - /etc/hosts:/etc/hosts:ro
+      - ./deps/supervisord.conf:/etc/supervisor/supervisord.conf:ro
+      - ./deps/supervisor.d:/etc/supervisor/supervisor.d:ro
+      - ~/work:/www/project
+      - ./logs/72:/usr/local/var/log
+      - ./logs/72:/data/log/service
+      - ./logs/72:/var/log/lazy
+      - ~/worklogs/log:/data/log
+      - ~/dockers-config/rainbow-niffler:/rainbow-niffler
+      - ~/dockers-config/niffler:/niffler
+    networks:
+      - wpt-network
+
+  php74:
+    build: ./php74
+    ports:
+      - "9007:9000"
+      - "9011:9009"
+    volumes:
+      - /etc/hosts:/etc/hosts:ro
+      - ./deps/supervisord.conf:/etc/supervisor/supervisord.conf:ro
+      - ./deps/supervisor.d:/etc/supervisor/supervisor.d:ro
+      - ~/work:/www/project
+      - ./logs/74:/usr/local/var/log
+      - ./logs/74:/data/log/service
+      - ./logs/74:/var/log/lazy
+      - ~/worklogs/log:/data/log
+      - ~/dockers-config/rainbow-niffler:/rainbow-niffler
+      - ~/dockers-config/niffler:/niffler
+      - ./conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    networks:
+      - wpt-network
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - "php70"
+      - "php72"
+      - "php74"
+    volumes:
+      - ~/worklogs/log:/data/log
+      - ~/work:/www/project
+      - ./nginx/sites:/etc/nginx/http.d
+    networks:
+      - wpt-network
+
+  mysql:
+    build: ./mysql
+    ports:
+      - "33060:3306"
+    volumes:
+      - ./mysql/mysql:/var/lib/mysql:rw
+      - ./mysql/logs:/var/lib/mysql-logs:rw
+      - ./mysql/conf.d:/etc/mysql/conf.d:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: 5eNyj6Nf # root密码 自行修改
+      MYSQL_USER: test # 子账号
+      MYSQL_PASSWORD: 2589632147 # 子密码
+    command: "--character-set-server=utf8mb4"
+    networks:
+      - wpt-network
+
+networks:
+  wpt-network:
+    driver: bridge
+    ipam:
+      driver: default
