@@ -106,6 +106,70 @@ services:
     networks:
       - wpt-network
 
+  elasticsearch:
+    #build是做构建镜像使用的，使用了image直接up -d即可
+    image: elasticsearch:7.17.0
+    environment:
+      - "cluster.name=jaeger" #设置集群名称为elasticsearch
+      - "discovery.type=single-node" #以单一节点模式启动
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m" #设置使用jvm内存大小
+      - "http.host=0.0.0.0"
+      - "transport.host=127.0.0.1"
+      - cluster.name=jaeger-cluster
+      - "xpack.security.enabled=false"
+    volumes:
+      - ./elasticsearch/plugins:/usr/share/elasticsearch/plugins #插件文件挂载
+      - ./elasticsearch/data:/usr/share/elasticsearch/data #数据文件挂载
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - wpt-network
+
+  #本机电脑无法支撑屏蔽该容器
+  # kibana:
+  #   image: kibana:7.17.0
+  #   links:
+  #     - elasticsearch:localhost #可以用localhost这个域名访问elasticsearch服务
+  #   depends_on:
+  #     - elasticsearch #kibana在elasticsearch启动之后再启动
+  #   environment:
+  #     - "elasticsearch.hosts=http://localhost:9200" #设置访问elasticsearch的地址
+  #   ports:
+  #     - "5601:5601"
+  #   networks:
+  #     - wpt-network
+
+  # logstash:
+  #   image: logstash:7.17.0
+  #   volumes:
+  #     - ./logstash/conf:/usr/share/logstash/pipeline/ #挂载logstash的配置文件
+  #   depends_on:
+  #     - elasticsearch #kibana在elasticsearch启动之后再启动
+  #   links:
+  #     - elasticsearch:localhost #可以用localhost这个域名访问elasticsearch服务
+  #   ports:
+  #     - "4560:4560"
+  #   networks:
+  #     - wpt-network
+
+  jaeger:
+    build: ./jaeger
+    ports:
+      - "6831:6831"
+      - "6832:6832"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+      - "5775:5775"
+    volumes:
+      - ./jaeger/tmp:/tmp
+    depends_on:
+      - elasticsearch
+    networks:
+      - wpt-network
+
 networks:
   wpt-network:
     driver: bridge
