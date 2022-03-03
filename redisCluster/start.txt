@@ -1,0 +1,5 @@
+#宿主机ip：端口
+docker exec -it redis7001 redis-cli -p 7001 -a 123456 --cluster create 10.102.50.49:7001 10.102.50.49:7002 10.102.50.49:7003 10.102.50.49:7004 10.102.50.49:7005 10.102.50.49:7006 --cluster-replicas 1
+
+#访问集群redis
+docker exec -it redis7001 redis-cli -h 127.0.0.1 -p 7003 -a 123456 -c
