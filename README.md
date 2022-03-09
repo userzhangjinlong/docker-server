@@ -12,5 +12,6 @@
 		/mysql/logs
 		/mysql/mysql
 		/nginx/sites
+		/elasticsearch/data
 		hosts
 	~~~

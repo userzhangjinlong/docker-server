@@ -126,7 +126,7 @@ services:
     networks:
       - wpt-network
 
-  #本机电脑无法支撑屏蔽该容器
+  # 本机电脑无法支撑屏蔽该容器正常使用机器内存需要满足大于等于16G
   # kibana:
   #   image: kibana:7.17.0
   #   links:
